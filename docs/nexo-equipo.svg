@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 160" role="img" aria-label="El equipo de Nexo: cinco grupos y una misma web">
+  <title>El equipo de Nexo</title>
+  <rect x="1" y="1" width="1198" height="158" rx="26" fill="#101e16" stroke="#31553e"/>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <text x="36" y="43" fill="#9dbcaa" font-size="12" letter-spacing="2">LAS PERSONAS DETRÁS DEL CÓDIGO</text>
+    <text x="34" y="91" fill="#e8f4eb" font-size="34" font-weight="700">Construimos Nexo juntos.</text>
+    <text x="36" y="126" fill="#9dbcaa" font-size="17">Cinco grupos. Doce módulos. Una misma web.</text>
+  </g>
+  <path d="M808 81H1104" stroke="#365340" stroke-width="3"/>
+  <g font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#10261a">
+    <rect x="787" y="55" width="48" height="48" rx="12" fill="#16bfdf"/><text x="811" y="86">01</text>
+    <rect x="860" y="55" width="48" height="48" rx="12" fill="#00dc88"/><text x="884" y="86">02</text>
+    <rect x="933" y="55" width="48" height="48" rx="12" fill="#ffe022"/><text x="957" y="86">03</text>
+    <rect x="1006" y="55" width="48" height="48" rx="12" fill="#f5a0f3"/><text x="1030" y="86">04</text>
+    <rect x="1079" y="55" width="48" height="48" rx="12" fill="#8bb9ff"/><text x="1103" y="86">05</text>
+  </g>
+</svg>
