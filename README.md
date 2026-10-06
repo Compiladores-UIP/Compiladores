@@ -124,19 +124,6 @@ Los colores, las ilustraciones y el movimiento mantienen el mismo estilo entre l
 | Código con colores | En los editores y las respuestas de la guía |
 | Tu avance guardado | Al volver a las lecciones desde el mismo navegador |
 
-## Abrir la web en tu equipo
-
-Necesitas **Node.js 24** y npm.
-
-```bash
-npm install
-npm run dev -- --port 3100
-```
-
-Abre **http://localhost:3100**. No necesitas configurar una clave de API. Para generar la versión de producción, usa `npm run build`.
-
-Los modelos de la guía requieren una descarga inicial considerable —aproximadamente 1,43 GB o 2,15 GB para el principal, según el dispositivo— y espacio para su caché. Si la conversación no puede iniciarse, la búsqueda por temas sigue disponible. Borrar los datos del sitio elimina el historial y puede obligar a descargar los modelos nuevamente.
-
 <details>
 <summary><strong>¿Quieres abrir los compiladores en Visual Studio?</strong></summary>
 
