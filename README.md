@@ -149,8 +149,4 @@ La web incluye [doce proyectos C# independientes](./proyectos-visual-studio/READ
 <div align="center">
 
 <img src="./docs/nexo-cierre.svg" alt="Nexo. Tu próxima idea empieza aquí." width="1200">
-
-[Volver al inicio ↑](#)
-
 </div>
-
