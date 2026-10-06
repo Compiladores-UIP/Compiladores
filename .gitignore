@@ -1,0 +1,28 @@
+node_modules/
+.next/
+.next-dev/
+*.tsbuildinfo
+.next-production/
+.playwright-mcp/
+
+proyectos-visual-studio/**/bin/
+proyectos-visual-studio/**/obj/
+proyectos-visual-studio/**/salida/
+proyectos-visual-studio/verificacion/
+
+# Configuración local y credenciales
+.env
+.env.*
+!.env.example
+
+# Archivos del editor y del sistema
+.vs/
+**/.vs/
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+
+# Registros de ejecución
+*.log
+npm-debug.log*
