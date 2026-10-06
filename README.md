@@ -112,10 +112,6 @@ Las tarjetas acompañan el desplazamiento y las secciones aparecen al avanzar po
 
 ![Figuras de Nexo siguiendo el movimiento del cursor en la portada](./docs/nexo-estela.gif)
 
-<sub>La estela del cursor, grabada en la web.</sub>
-
-Los colores, las ilustraciones y el movimiento mantienen el mismo estilo entre la portada, las lecciones y el laboratorio. Los efectos respetan la preferencia de movimiento reducido. El buscador también se puede usar con flechas, Enter y Escape.
-
 | Un detalle | Dónde lo encuentras |
 | --- | --- |
 | Tarjetas en movimiento | Al recorrer la portada |
@@ -123,6 +119,19 @@ Los colores, las ilustraciones y el movimiento mantienen el mismo estilo entre l
 | Recorrido paso a paso | Al ejecutar los ejemplos del laboratorio |
 | Código con colores | En los editores y las respuestas de la guía |
 | Tu avance guardado | Al volver a las lecciones desde el mismo navegador |
+
+## El equipo de Nexo
+
+![Cinco grupos construyendo los doce módulos de Nexo](./docs/nexo-equipo.svg)
+
+| Grupo | Integrantes | Módulos a cargo |
+| --- | --- | --- |
+| **01 · Grupo 1** | Daniela, Aaron y Euris | **01** Hola Mundo · **06** Estructuras IF · **09** Lenguaje para formularios |
+| **02 · Grupo 2** | Diego, Franklin y Gil | **02** Operaciones matemáticas · **07** Ciclos · **12** Mini lenguaje de programación completo |
+| **03 · Grupo 3** | Ana y Josimar | **03** Variables · **10** Consultas simples |
+| **04 · Grupo 4** | Karen y Zachrison | **04** Calculadora · **11** Lenguaje de configuración |
+| **05 · Grupo 5** | Miguel Mes, Alonso y Carlos | **05** Mensajes personalizados · **08** Pseudocódigo a C# |
+| **Landing Page** | Franklin |  |
 
 <details>
 <summary><strong>¿Quieres abrir los compiladores en Visual Studio?</strong></summary>
