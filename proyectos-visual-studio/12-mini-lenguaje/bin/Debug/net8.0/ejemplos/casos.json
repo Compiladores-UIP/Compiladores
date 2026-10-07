@@ -1,0 +1,18 @@
+[
+  {
+    "Name": "Ejemplo principal",
+    "Source": "ENTERO total = 0\nPARA i = 1 HASTA 5 HACER\n  total = total + i\nFINPARA\nSI total >= 15 ENTONCES\n  MOSTRAR \"Total: \" + total\nSINO\n  MOSTRAR \"Revisa el cálculo\"\nFINSI",
+    "Expected": "Total: 15"
+  },
+  {
+    "Name": "Entrada vacía rechazada",
+    "Source": "",
+    "Expected": "",
+    "Error": true
+  },
+  {
+    "Name": "Caso alternativo",
+    "Source": "ENTERO i = 0\nREPETIR\n i = i + 1\nHASTA i >= 2\nIMPRIMIR i",
+    "Expected": "2"
+  }
+]

@@ -1,0 +1,9 @@
+ENTERO total = 0
+PARA i = 1 HASTA 5 HACER
+  total = total + i
+FINPARA
+SI total >= 15 ENTONCES
+  MOSTRAR "Total: " + total
+SINO
+  MOSTRAR "Revisa el cálculo"
+FINSI

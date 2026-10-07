@@ -1,0 +1,191 @@
+[
+  {
+    "Kind": "Declaration",
+    "Name": "total",
+    "Type": "int",
+    "Expression": {
+      "Kind": "Literal",
+      "Text": "0",
+      "Value": 0,
+      "Left": null,
+      "Right": null
+    },
+    "Body": null,
+    "Otherwise": null,
+    "Initial": null,
+    "Update": null
+  },
+  {
+    "Kind": "For",
+    "Name": null,
+    "Type": null,
+    "Expression": {
+      "Kind": "Binary",
+      "Text": "\u003C=",
+      "Value": null,
+      "Left": {
+        "Kind": "Variable",
+        "Text": "i",
+        "Value": null,
+        "Left": null,
+        "Right": null
+      },
+      "Right": {
+        "Kind": "Literal",
+        "Text": "5",
+        "Value": 5,
+        "Left": null,
+        "Right": null
+      }
+    },
+    "Body": [
+      {
+        "Kind": "Assignment",
+        "Name": "total",
+        "Type": null,
+        "Expression": {
+          "Kind": "Binary",
+          "Text": "\u002B",
+          "Value": null,
+          "Left": {
+            "Kind": "Variable",
+            "Text": "total",
+            "Value": null,
+            "Left": null,
+            "Right": null
+          },
+          "Right": {
+            "Kind": "Variable",
+            "Text": "i",
+            "Value": null,
+            "Left": null,
+            "Right": null
+          }
+        },
+        "Body": null,
+        "Otherwise": null,
+        "Initial": null,
+        "Update": null
+      }
+    ],
+    "Otherwise": null,
+    "Initial": {
+      "Kind": "Declaration",
+      "Name": "i",
+      "Type": "int",
+      "Expression": {
+        "Kind": "Literal",
+        "Text": "1",
+        "Value": 1,
+        "Left": null,
+        "Right": null
+      },
+      "Body": null,
+      "Otherwise": null,
+      "Initial": null,
+      "Update": null
+    },
+    "Update": {
+      "Kind": "Assignment",
+      "Name": "i",
+      "Type": null,
+      "Expression": {
+        "Kind": "Binary",
+        "Text": "\u002B",
+        "Value": null,
+        "Left": {
+          "Kind": "Variable",
+          "Text": "i",
+          "Value": null,
+          "Left": null,
+          "Right": null
+        },
+        "Right": {
+          "Kind": "Literal",
+          "Text": "1",
+          "Value": 1,
+          "Left": null,
+          "Right": null
+        }
+      },
+      "Body": null,
+      "Otherwise": null,
+      "Initial": null,
+      "Update": null
+    }
+  },
+  {
+    "Kind": "If",
+    "Name": null,
+    "Type": null,
+    "Expression": {
+      "Kind": "Binary",
+      "Text": "\u003E=",
+      "Value": null,
+      "Left": {
+        "Kind": "Variable",
+        "Text": "total",
+        "Value": null,
+        "Left": null,
+        "Right": null
+      },
+      "Right": {
+        "Kind": "Literal",
+        "Text": "15",
+        "Value": 15,
+        "Left": null,
+        "Right": null
+      }
+    },
+    "Body": [
+      {
+        "Kind": "Print",
+        "Name": null,
+        "Type": null,
+        "Expression": {
+          "Kind": "Binary",
+          "Text": "\u002B",
+          "Value": null,
+          "Left": {
+            "Kind": "Literal",
+            "Text": "\u0022Total: \u0022",
+            "Value": "Total: ",
+            "Left": null,
+            "Right": null
+          },
+          "Right": {
+            "Kind": "Variable",
+            "Text": "total",
+            "Value": null,
+            "Left": null,
+            "Right": null
+          }
+        },
+        "Body": null,
+        "Otherwise": null,
+        "Initial": null,
+        "Update": null
+      }
+    ],
+    "Otherwise": [
+      {
+        "Kind": "Print",
+        "Name": null,
+        "Type": null,
+        "Expression": {
+          "Kind": "Literal",
+          "Text": "\u0022Revisa el c\u00E1lculo\u0022",
+          "Value": "Revisa el c\u00E1lculo",
+          "Left": null,
+          "Right": null
+        },
+        "Body": null,
+        "Otherwise": null,
+        "Initial": null,
+        "Update": null
+      }
+    ],
+    "Initial": null,
+    "Update": null
+  }
+]
