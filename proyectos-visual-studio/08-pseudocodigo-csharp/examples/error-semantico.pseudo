@@ -1,0 +1,4 @@
+INICIO
+    ENTERO edad = "veinte"
+    IMPRIMIR edad
+FIN

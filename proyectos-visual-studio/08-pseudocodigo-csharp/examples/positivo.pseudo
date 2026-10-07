@@ -1,0 +1,8 @@
+INICIO
+    ENTERO numero = 5
+    SI numero > 0 ENTONCES
+        IMPRIMIR "Positivo"
+    SINO
+        IMPRIMIR "No positivo"
+    FIN_SI
+FIN

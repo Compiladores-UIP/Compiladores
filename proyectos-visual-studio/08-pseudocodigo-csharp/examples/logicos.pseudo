@@ -1,0 +1,10 @@
+INICIO
+    ENTERO nota = 91
+    LOGICO asistencia = VERDADERO
+    SI nota >= 71 Y asistencia ENTONCES
+        IMPRIMIR "Aprobado"
+    SINO
+        IMPRIMIR "Reprobado"
+    FIN_SI
+    IMPRIMIR NO FALSO
+FIN

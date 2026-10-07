@@ -1,0 +1,10 @@
+INICIO
+    ENTERO a = 10
+    ENTERO b = 4
+    ENTERO resultado = a + b * 2
+    DECIMAL promedio = (a + b) / 2.0
+    TEXTO mensaje = "Resultado: "
+    IMPRIMIR mensaje, resultado
+    IMPRIMIR "Promedio: ", promedio
+    IMPRIMIR "Division entera: ", a / b
+FIN
