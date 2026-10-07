@@ -244,7 +244,7 @@ El analizador informa que `MOSTRAR` no pertenece al lenguaje definido para este 
 
 
 
-## Integrantes
+## Integrantes:
 
 - Daniela Insturaín
 - Aaron Fehrenbach
