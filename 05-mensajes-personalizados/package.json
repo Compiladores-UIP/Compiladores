@@ -1,0 +1,14 @@
+{
+  "name": "uip-grupo05-05-mensajes-personalizados",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Mini-compilador de mensajes personalizados",
+  "scripts": {
+    "test": "node --test tests/compiler.test.cjs tests/cli.test.cjs",
+    "test:ui": "node --test ../tests/portal.test.cjs",
+    "test:dotnet": "node --test tests/dotnet.test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
