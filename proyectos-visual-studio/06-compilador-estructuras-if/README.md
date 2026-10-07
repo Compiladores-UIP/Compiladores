@@ -291,15 +291,6 @@ Error sintáctico: falta FIN_SI.
 | `MiniCompiladorEstructurasIf.csproj` | Define el proyecto de consola en .NET 8. |
 | `README.md` | Describe el lenguaje, tokens, reglas, pruebas y ejecución. |
 
-## Qué no hace este mini-compilador
-
-Para mantener el alcance académico controlado:
-
-- procesa una declaración principal por ejecución;
-- procesa una estructura `SI` por ejecución;
-- no implementa estructuras `SI` anidadas;
-- no implementa ciclos;
-- no mantiene una tabla de múltiples variables.
 
 ## Integrantes
 
