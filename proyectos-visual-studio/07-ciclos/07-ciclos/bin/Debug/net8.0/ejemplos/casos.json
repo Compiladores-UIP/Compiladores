@@ -1,0 +1,18 @@
+[
+  {
+    "Name": "Ejemplo principal",
+    "Source": "ENTERO i = 1\nMIENTRAS i <= 3 HACER\n  IMPRIMIR i\n  i = i + 1\nFINMIENTRAS",
+    "Expected": "1\n2\n3"
+  },
+  {
+    "Name": "Entrada vacía rechazada",
+    "Source": "",
+    "Expected": "",
+    "Error": true
+  },
+  {
+    "Name": "Caso alternativo",
+    "Source": "ENTERO i = 0\nREPETIR\n i = i + 1\nHASTA i >= 2\nIMPRIMIR i",
+    "Expected": "2"
+  }
+]
