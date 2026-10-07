@@ -432,12 +432,6 @@ Los archivos temporales generados por este proceso no forman parte del repositor
 | `MiniCompiladorFormularios.csproj` | Define el proyecto Windows Forms en .NET 8. |
 | `README.md` | Documenta sintaxis, tokens, pruebas, errores, generación, guardado y verificación. |
 
-## Alcance
-
-El proyecto es un ejemplo académico. Implementa controles básicos, compilación del formulario y guardado local simple en CSV. No utiliza base de datos, autenticación, servicios externos ni almacenamiento en red.
-
-La acción de persistencia está definida para `BOTON "Guardar"`. Otros textos de botón pueden generarse visualmente, pero no reciben una acción adicional automática.
-
 ## Integrantes
 
 - Daniela Insturaín
