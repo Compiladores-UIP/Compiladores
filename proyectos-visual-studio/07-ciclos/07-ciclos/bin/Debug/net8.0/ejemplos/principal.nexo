@@ -1,0 +1,5 @@
+ENTERO i = 1
+MIENTRAS i <= 3 HACER
+  IMPRIMIR i
+  i = i + 1
+FINMIENTRAS
