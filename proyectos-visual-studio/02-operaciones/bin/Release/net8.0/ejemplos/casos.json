@@ -1,0 +1,18 @@
+[
+  {
+    "Name": "Ejemplo principal",
+    "Source": "10 + 5 * 2",
+    "Expected": "20"
+  },
+  {
+    "Name": "Entrada vacía rechazada",
+    "Source": "",
+    "Expected": "",
+    "Error": true
+  },
+  {
+    "Name": "Caso alternativo",
+    "Source": "(10 + 5) * 2",
+    "Expected": "30"
+  }
+]

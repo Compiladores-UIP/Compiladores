@@ -1,0 +1,42 @@
+[
+  {
+    "Kind": "Print",
+    "Name": null,
+    "Type": null,
+    "Expression": {
+      "Kind": "Binary",
+      "Text": "\u002B",
+      "Value": null,
+      "Left": {
+        "Kind": "Literal",
+        "Text": "10",
+        "Value": 10,
+        "Left": null,
+        "Right": null
+      },
+      "Right": {
+        "Kind": "Binary",
+        "Text": "*",
+        "Value": null,
+        "Left": {
+          "Kind": "Literal",
+          "Text": "5",
+          "Value": 5,
+          "Left": null,
+          "Right": null
+        },
+        "Right": {
+          "Kind": "Literal",
+          "Text": "2",
+          "Value": 2,
+          "Left": null,
+          "Right": null
+        }
+      }
+    },
+    "Body": null,
+    "Otherwise": null,
+    "Initial": null,
+    "Update": null
+  }
+]
