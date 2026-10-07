@@ -1,0 +1,14 @@
+// Mini-Compilador 04 · Calculadora (casos con errores)
+// Cada línea muestra un error de una fase distinta.
+DECIMAL a = 10
+DECIMAL b = 0
+IMPRIMIR a / b
+IMPRIMIR a +
+ENTERO mitad = a / 2
+IMPRIMIR a # b
+imprimir a + b
+IMPRIMIR total * 2
+DECIMAL c = 4,5
+IMPRIMIR (a + 1
+IMPRIMIR RAIZ(b - a)
+DECIMAL a = 3

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CompiladorCalculadora</RootNamespace>
+    <AssemblyName>CompiladorCalculadora</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!-- Los programas de ejemplo se copian junto al .exe -->
+  <ItemGroup>
+    <None Update="ejemplos\*.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- La carpeta del programa generado no forma parte de este proyecto -->
+  <ItemGroup>
+    <Compile Remove="ProgramaGenerado\**" />
+    <None Remove="ProgramaGenerado\**" />
+  </ItemGroup>
+
+</Project>

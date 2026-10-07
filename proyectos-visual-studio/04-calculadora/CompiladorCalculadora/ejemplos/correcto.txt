@@ -1,0 +1,19 @@
+// Mini-Compilador 04 · Calculadora (caso correcto)
+DECIMAL a = 10
+DECIMAL b = 5
+IMPRIMIR "Suma:", a + b
+IMPRIMIR "Resta:", a - b
+IMPRIMIR "Multiplicación:", a * b
+IMPRIMIR "División:", a / b
+
+// Precedencia, paréntesis, potencia y funciones
+ENTERO x = 7
+ENTERO y = 2
+IMPRIMIR "7 / 2 =", x / y
+IMPRIMIR "7 % 2 =", x % y
+DECIMAL promedio = (a + b + x) / 3
+IMPRIMIR "Promedio:", promedio
+IMPRIMIR "Hipotenusa:", RAIZ(3 ^ 2 + 4 ^ 2)
+IMPRIMIR "Distancia:", ABS(b - a)
+x = x * 3 - 1
+MOSTRAR "x ahora vale", x
