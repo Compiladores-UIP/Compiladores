@@ -295,5 +295,5 @@ Error sintáctico: falta FIN_SI.
 ## Integrantes
 
 - Daniela Insturaín
-- Aaron Fechrenback
+- Aaron Fehrenbach
 - Euris J. Rodríguez V.
