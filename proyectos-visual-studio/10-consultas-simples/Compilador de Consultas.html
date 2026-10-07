@@ -1,0 +1,1010 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Compilador de Consultas</title>
+<meta name="description" content="Mini-Compilador 10 · Consultas simples: traduce consultas en español a SQL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: portal nexo (dark) — hero con la traducción como tesis, laboratorio de dos paneles, luego las secciones A–H de la guía en orden. */
+:root {
+  --bg: #0c1411;
+  --bg-2: #101a16;
+  --surface: #15201b;
+  --surface-2: #1b2822;
+  --line: #24332c;
+  --line-2: #33463c;
+  --fg: #eaf2ed;
+  --muted: #9aaca2;
+  --dim: #6a7d73;
+  --green: #23e08f;
+  --green-soft: rgba(35, 224, 143, .12);
+  --ink: #04130b;
+  --yellow: #ffd23a;
+  --cyan: #2fc3ee;
+  --pink: #ee96f5;
+  --orange: #ffad5c;
+  --red: #ff7676;
+  --red-soft: rgba(255, 118, 118, .12);
+  --f-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  --r: 14px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: 20px; }
+.mono { font-family: var(--f-mono); }
+code.inl { font-family: var(--f-mono); font-size: .9em; background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+
+/* ---------- nav ---------- */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 22px; height: 66px; }
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.logo .br { font-family: var(--f-mono); color: var(--green); font-weight: 700; font-size: 18px; }
+.logo b { font-family: var(--f-display); font-size: 24px; letter-spacing: -.05em; line-height: 1; }
+.logo b i { color: var(--green); font-style: normal; }
+.logo small { display: block; font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .3em; color: var(--muted); margin-top: 3px; }
+.crumbs { font-family: var(--f-mono); font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.crumbs b { color: var(--fg); font-weight: 500; }
+.nav-links { margin-left: auto; display: flex; gap: 20px; font-size: 14px; }
+.nav-links a { text-decoration: none; color: var(--muted); }
+.nav-links a:hover { color: var(--fg); }
+@media (max-width: 920px) { .nav-links, .crumbs { display: none; } .nav .btn { margin-left: auto; } }
+
+.btn { display: inline-flex; align-items: center; gap: 9px; border-radius: 999px; padding: 12px 22px; font-weight: 700; font-size: 14.5px; text-decoration: none; border: 1px solid transparent; transition: transform .15s, border-color .15s, background .15s; white-space: nowrap; }
+.btn:hover { transform: translateY(-1px); }
+.btn-green { background: var(--green); color: var(--ink); }
+.btn-ghost { border-color: var(--line-2); background: transparent; }
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+
+/* ---------- hero ---------- */
+.hero { position: relative; overflow: hidden; padding-block: 64px 52px; }
+.hero::before { content: ""; position: absolute; inset: -30% -10% auto; height: 540px; background: radial-gradient(closest-side, rgba(35, 224, 143, .13), transparent 70%); pointer-events: none; }
+.hero .wrap { position: relative; display: grid; gap: 20px; justify-items: center; text-align: center; }
+.eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--green); display: inline-flex; align-items: center; gap: 8px; }
+.eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -.035em; }
+.hero h1 { font-size: clamp(36px, 6.6vw, 72px); line-height: .98; font-weight: 800; }
+.hero h1 span { display: block; color: var(--green); }
+.lead { color: var(--muted); max-width: 62ch; font-size: 16px; margin: 0; }
+.hero .lead { text-align: center; }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.chip { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 11px; }
+.chip.g { color: var(--green); border-color: rgba(35, 224, 143, .35); }
+.transform { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px; width: min(820px, 100%); }
+.tcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 15px 18px; text-align: left; min-width: 0; }
+.tcard .lab { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
+.tcard code { font-family: var(--f-mono); font-size: clamp(13px, 1.7vw, 16px); display: block; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 1.6em; }
+.arrow { width: 48px; height: 48px; border-radius: 50%; background: var(--green); color: var(--ink); display: grid; place-items: center; font-weight: 800; font-size: 19px; box-shadow: 0 0 0 8px var(--green-soft); }
+@media (max-width: 640px) { .transform { grid-template-columns: minmax(0, 1fr); } .arrow { justify-self: center; transform: rotate(90deg); } }
+
+/* ---------- section scaffolding (A–H) ---------- */
+section { padding-block: 60px; border-top: 1px solid var(--line); scroll-margin-top: 70px; }
+.sec-head { display: grid; gap: 12px; margin-bottom: 28px; }
+.sec-head .tag { display: flex; align-items: center; gap: 10px; }
+.sec-head .letter { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--green); color: var(--ink); font-family: var(--f-mono); font-weight: 700; font-size: 14px; }
+.sec-head .tag span:last-child { font-family: var(--f-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+h2 { font-size: clamp(27px, 3.8vw, 40px); line-height: 1.06; font-weight: 700; }
+h2 em { font-style: normal; color: var(--green); }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; min-width: 0; }
+.panel h3 { font-size: 18px; margin-bottom: 8px; }
+.panel p { margin: 0 0 10px; color: var(--muted); font-size: 14.5px; }
+.panel p:last-child { margin-bottom: 0; }
+.prose p { color: var(--muted); max-width: 70ch; margin: 0 0 12px; font-size: 15.5px; }
+.prose strong { color: var(--fg); font-weight: 600; }
+
+pre.block { margin: 0; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; overflow-x: auto; font-family: var(--f-mono); font-size: 13.5px; line-height: 1.75; white-space: pre; }
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2); }
+table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.t th { text-align: left; font-family: var(--f-mono); font-weight: 500; font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--dim); padding: 12px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.t td { padding: 11px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t tr:last-child td { border-bottom: 0; }
+table.t td.m { font-family: var(--f-mono); font-size: 13px; white-space: nowrap; }
+table.t td.d { color: var(--muted); font-size: 13.5px; }
+
+/* syntax colors */
+.hl-kw { color: var(--cyan); font-weight: 500; }
+.hl-kw2 { color: var(--orange); font-weight: 500; }
+.hl-id { color: var(--fg); }
+.hl-op { color: var(--muted); }
+.hl-num { color: var(--yellow); }
+.hl-str { color: var(--green); }
+.hl-bool { color: var(--pink); }
+.hl-com { color: var(--dim); font-style: italic; }
+.hl-bad { color: var(--red); }
+.hl-err { text-decoration: underline wavy var(--red); text-underline-offset: 4px; text-decoration-skip-ink: none; }
+.cs-kw { color: var(--cyan); }
+.cs-ty { color: var(--pink); }
+
+/* ---------- lab ---------- */
+.lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: 16px; }
+@media (max-width: 980px) { .lab { grid-template-columns: minmax(0, 1fr); } }
+.pane { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px 9px 16px; border-bottom: 1px solid var(--line); min-height: 50px; flex-wrap: wrap; }
+.bar .ttl { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.bar .sp { flex: 1; }
+.dots { display: flex; gap: 6px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-2); }
+.editor { display: grid; grid-template-columns: 44px minmax(0, 1fr); height: 360px; font-family: var(--f-mono); font-size: 13.5px; line-height: 24px; }
+.gutter { padding-block: 14px; text-align: right; color: var(--dim); overflow: hidden; border-right: 1px solid var(--line); user-select: none; }
+.gutter div { padding-right: 10px; position: relative; }
+.gutter div.bad { color: var(--red); }
+.gutter div.bad::before { content: ""; position: absolute; left: 6px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+.area { position: relative; min-width: 0; }
+.area pre, .area textarea { position: absolute; inset: 0; margin: 0; padding: 14px 16px; font: inherit; line-height: inherit; white-space: pre; tab-size: 4; border: 0; overflow: auto; letter-spacing: 0; }
+.area pre { pointer-events: none; overflow: hidden; color: var(--fg); }
+.area textarea { background: transparent; color: transparent; caret-color: var(--green); resize: none; outline: none; }
+.area textarea::selection { background: rgba(47, 195, 238, .3); }
+.phases { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.phase { padding: 10px 12px; border-right: 1px solid var(--line); min-width: 0; display: grid; gap: 1px; }
+.phase:last-child { border-right: 0; }
+.phase .n { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .12em; color: var(--dim); }
+.phase b { font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.phase b::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex: none; }
+.phase.bad b::before { background: var(--red); }
+.phase.skip b::before { background: var(--line-2); }
+.phase small { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 560px) { .phases { grid-template-columns: repeat(2, minmax(0, 1fr)); } .phase { border-bottom: 1px solid var(--line); } .phase:nth-child(2n) { border-right: 0; } }
+.tabs { display: flex; gap: 3px; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.tab { border: 0; background: transparent; padding: 7px 10px; border-radius: 8px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.tab[aria-selected="true"] { background: var(--surface-2); color: var(--fg); }
+.tab .cnt { font-family: var(--f-mono); font-size: 11px; margin-left: 4px; color: var(--dim); }
+.tab .cnt.bad { color: var(--red); }
+.out { height: 360px; overflow: auto; }
+.out pre { margin: 0; padding: 14px 16px; font-family: var(--f-mono); font-size: 13px; line-height: 22px; white-space: pre; }
+.out table.t { font-size: 13px; }
+.out table.t th { position: sticky; top: 0; background: var(--bg-2); }
+.out table.t td { padding: 7px 14px; }
+.out .blk { padding: 12px 16px 4px; }
+.out .blk + .blk { border-top: 1px solid var(--line); }
+.out .cap { font-family: var(--f-mono); font-size: 12px; color: var(--yellow); margin-bottom: 8px; overflow-wrap: anywhere; }
+.out .rows { font-size: 12px; color: var(--dim); margin: 6px 0 10px; }
+.out .mini { border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+.status { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.pill { font-family: var(--f-mono); font-size: 11px; padding: 3px 9px; border-radius: 999px; background: var(--green-soft); color: var(--green); white-space: nowrap; }
+.pill.bad { background: var(--red-soft); color: var(--red); }
+.pill.off { background: var(--surface-2); color: var(--dim); }
+.checks { list-style: none; margin: 0; padding: 14px 16px; display: grid; gap: 7px; }
+.checks li { position: relative; padding-left: 22px; font-size: 13.5px; }
+.checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+.errs { list-style: none; margin: 0; padding: 12px; display: grid; gap: 10px; }
+.errs li { border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: 10px; background: var(--surface); padding: 11px 14px; display: grid; gap: 3px; cursor: pointer; }
+.errs .where { font-family: var(--f-mono); font-size: 11px; color: var(--dim); display: flex; gap: 10px; flex-wrap: wrap; }
+.errs .where b { color: var(--red); font-weight: 500; }
+.errs .hint { font-size: 13px; color: var(--muted); }
+.errs .hint::before { content: "→ "; color: var(--green); }
+.empty { padding: 44px 24px; text-align: center; color: var(--muted); display: grid; gap: 8px; justify-items: center; }
+.empty .big { font-family: var(--f-display); font-size: 21px; color: var(--fg); letter-spacing: -.03em; }
+.console { color: var(--fg); }
+.console .dim { color: var(--dim); }
+.console .pr { color: var(--green); }
+
+.examples { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.ex { border: 1px solid var(--line-2); background: var(--surface); border-radius: 12px; padding: 10px 14px; text-align: left; display: grid; gap: 1px; transition: border-color .15s, transform .15s; }
+.ex:hover { transform: translateY(-2px); border-color: var(--muted); }
+.ex.on { border-color: var(--green); }
+.ex b { font-size: 14px; }
+.ex span { font-size: 12.5px; color: var(--muted); }
+
+/* ---------- flow (fases) ---------- */
+.flow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+@media (max-width: 980px) { .flow { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .flow { grid-template-columns: minmax(0, 1fr); } }
+.step { background: var(--bg-2); padding: 18px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: grid; gap: 8px; align-content: start; min-width: 0; }
+.step .n { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .12em; color: var(--dim); }
+.step h3 { font-size: 17px; }
+.step p { margin: 0; font-size: 13px; color: var(--muted); }
+.step code { font-family: var(--f-mono); font-size: 12px; color: var(--yellow); overflow-wrap: anywhere; }
+
+/* ---------- tests ---------- */
+.tests { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .tests { grid-template-columns: minmax(0, 1fr); } }
+.test { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.test.okc { border-top: 3px solid var(--green); }
+.test.badc { border-top: 3px solid var(--red); }
+.test .k { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; }
+.test.okc .k { color: var(--green); }
+.test.badc .k { color: var(--red); }
+.test pre { margin: 0; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-family: var(--f-mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre; }
+.test .exp { font-size: 13.5px; color: var(--muted); }
+.test .exp b { color: var(--fg); font-weight: 600; }
+.test button { justify-self: start; }
+.errlist { display: grid; gap: 8px; }
+.errlist div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; font-size: 13px; padding: 8px 10px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--line); }
+.errlist code { font-family: var(--f-mono); font-size: 12.5px; color: var(--fg); overflow-wrap: anywhere; }
+.errlist span { color: var(--red); }
+
+/* ---------- team / footer ---------- */
+.team { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .team { grid-template-columns: minmax(0, 1fr); } }
+footer { border-top: 1px solid var(--line); padding-block: 32px; color: var(--dim); font-size: 13px; }
+footer .wrap { display: flex; gap: 14px; justify-content: space-between; flex-wrap: wrap; }
+.toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 16px); background: var(--green); color: var(--ink); font-weight: 700; font-size: 14px; padding: 10px 18px; border-radius: 999px; opacity: 0; pointer-events: none; transition: .2s; z-index: 50; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+</style>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="https://nexo-eight-omega.vercel.app/"><span class="br">{ }</span><span><b>nexo<i>.</i></b><small>APRENDE. CREA. CONECTA.</small></span></a>
+    <span class="crumbs">Compiladores / <b>10 · Consultas simples</b></span>
+    <nav class="nav-links" aria-label="Secciones">
+      <a href="#problema">Problema</a><a href="#lenguaje">Lenguaje</a><a href="#laboratorio">Laboratorio</a><a href="#fases">Fases</a><a href="#pruebas">Pruebas</a>
+    </nav>
+    <a class="btn btn-green btn-sm" href="https://nexo-eight-omega.vercel.app/#modulos">Portal ↗</a>
+  </div>
+</header>
+
+<main>
+  <!-- A. Nombre del proyecto -->
+  <div class="hero" id="inicio">
+    <div class="wrap">
+      <span class="eyebrow">Compilador 10 · Grupo 3</span>
+      <h1>Mini-Compilador de Consultas<span>Pregunta a los datos.</span></h1>
+      <p class="lead">Escribe consultas en español como <code class="inl">BUSCAR estudiante DONDE edad &gt; 18</code>. El compilador revisa que la tabla y los campos existan, genera la sentencia SQL y muestra las filas que devuelve.</p>
+      <div class="ctas">
+        <a class="btn btn-green" href="#laboratorio">Probar el compilador →</a>
+        <a class="btn btn-ghost" href="#fases">Ver las fases</a>
+      </div>
+      <div class="meta"><span class="chip g">Nivel intermedio</span><span class="chip">Lenguaje destino: SQL</span><span class="chip">C# · .NET 8</span></div>
+      <div class="transform" aria-label="Ejemplo de traducción">
+        <div class="tcard"><div class="lab">Lenguaje fuente</div><code id="heroIn"></code></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="tcard"><div class="lab">SQL generado</div><code id="heroOut"></code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. Problema -->
+  <section id="problema">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">B</span><span>Problema que resuelve</span></div><h2>Consultar una base de datos <em>sin saber SQL.</em></h2></div>
+      <div class="grid2">
+        <div class="prose">
+          <p>Para obtener información de una base de datos hay que escribir sentencias SQL como <code class="inl">SELECT * FROM estudiante WHERE edad &gt; 18;</code>. Esa sintaxis en inglés, con sus cláusulas y comillas simples, es una barrera para quien empieza.</p>
+          <p>Este mini-compilador acepta la misma consulta en español. Comprueba que la <strong>tabla</strong> y los <strong>campos</strong> existan y que cada condición compare <strong>tipos compatibles</strong>, por ejemplo un número con un número. Si todo está bien, genera el SQL equivalente y lo ejecuta sobre una base de datos de ejemplo.</p>
+        </div>
+        <div class="panel">
+          <h3>Qué identifica en cada consulta</h3>
+          <div class="tbl-wrap" style="margin-top:6px">
+            <table class="t"><tbody>
+              <tr><td class="m hl-kw">BUSCAR</td><td class="d">Qué se quiere obtener</td><td class="m cs-kw">SELECT</td></tr>
+              <tr><td class="m">estudiante</td><td class="d">Tabla de origen</td><td class="m cs-kw">FROM</td></tr>
+              <tr><td class="m hl-kw">DONDE</td><td class="d">Condición para filtrar filas</td><td class="m cs-kw">WHERE</td></tr>
+              <tr><td class="m">edad <span class="hl-op">&gt;</span> <span class="hl-num">18</span></td><td class="d">Campo, operador y valor</td><td class="m">edad &gt; 18</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C. Lenguaje fuente -->
+  <section id="lenguaje">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">C</span><span>Lenguaje fuente creado</span></div><h2>Palabras en español, <em>cláusulas de SQL.</em></h2>
+        <p class="lead">Una consulta por línea. Las palabras clave van en mayúsculas y los textos entre comillas dobles. Se pueden elegir campos con <code class="inl">DE</code>, unir condiciones con <code class="inl">Y</code> / <code class="inl">O</code> y ordenar con <code class="inl">ORDENAR POR</code>.</p></div>
+      <div class="grid2">
+        <pre class="block" data-src>
+// Consultas de ejemplo
+BUSCAR estudiante DONDE edad > 18
+BUSCAR nombre, carrera DE estudiante DONDE carrera = "Sistemas"
+BUSCAR estudiante DONDE edad < 18 O promedio < 70 ORDENAR POR edad DESC
+BUSCAR curso</pre>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>Lenguaje fuente</th><th>SQL</th></tr></thead>
+            <tbody>
+              <tr><td class="m hl-kw">BUSCAR</td><td class="m cs-kw">SELECT</td></tr>
+              <tr><td class="m hl-kw">DE</td><td class="m cs-kw">FROM</td></tr>
+              <tr><td class="m hl-kw">DONDE</td><td class="m cs-kw">WHERE</td></tr>
+              <tr><td class="m hl-kw">Y · O</td><td class="m cs-kw">AND · OR</td></tr>
+              <tr><td class="m hl-kw">ORDENAR POR … ASC / DESC</td><td class="m cs-kw">ORDER BY … ASC / DESC</td></tr>
+              <tr><td class="m hl-str">"Sistemas"</td><td class="m hl-str">'Sistemas'</td></tr>
+              <tr><td class="m hl-op">&gt;  &lt;  &gt;=  &lt;=  =  &lt;&gt;</td><td class="m hl-op">&gt;  &lt;  &gt;=  &lt;=  =  &lt;&gt;</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sec-head" style="margin:34px 0 14px"><h3 style="font-size:20px">Base de datos de ejemplo</h3></div>
+      <div class="grid2" id="tablasBD"></div>
+    </div>
+  </section>
+
+  <!-- Laboratorio -->
+  <section id="laboratorio">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">▶</span><span>Laboratorio</span></div><h2>Escribe, compila <em>y mira cada fase.</em></h2>
+        <p class="lead">El compilador corre en esta página con la misma lógica que el proyecto de Visual Studio. Se recompila con cada tecla. Elige un ejemplo o escribe tus consultas.</p></div>
+      <div class="lab">
+        <div class="pane">
+          <div class="bar"><div class="dots"><i></i><i></i><i></i></div><span class="ttl">consultas.txt</span><span class="sp"></span><button class="btn btn-ghost btn-sm" id="btnClear" type="button">Limpiar</button></div>
+          <div class="editor">
+            <div class="gutter" id="gutter"></div>
+            <div class="area"><pre id="hl" aria-hidden="true"></pre><textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Consultas"></textarea></div>
+          </div>
+          <div class="phases" id="phases"></div>
+        </div>
+        <div class="pane">
+          <div class="bar">
+            <div class="tabs" role="tablist" id="tabs">
+              <button class="tab" role="tab" type="button" data-t="tok">Tokens<span class="cnt" id="cTok"></span></button>
+              <button class="tab" role="tab" type="button" data-t="tree">Árbol</button>
+              <button class="tab" role="tab" type="button" data-t="sem">Semántico</button>
+              <button class="tab" role="tab" type="button" data-t="code">SQL</button>
+              <button class="tab" role="tab" type="button" data-t="run">Resultado</button>
+              <button class="tab" role="tab" type="button" data-t="err">Errores<span class="cnt" id="cErr"></span></button>
+            </div>
+            <span class="sp"></span><button class="btn btn-ghost btn-sm" id="btnCopy" type="button">Copiar SQL</button>
+          </div>
+          <div class="out" id="out"></div>
+          <div class="status" id="status"></div>
+        </div>
+      </div>
+      <div class="examples" id="examples"></div>
+    </div>
+  </section>
+
+  <!-- D. Tokens -->
+  <section id="tokens">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">D</span><span>Tokens identificados</span></div><h2>Las unidades léxicas <em>de una consulta.</em></h2>
+        <p class="lead">El analizador léxico separa palabras clave, nombres de tablas y campos, operadores y valores. Los operadores de dos caracteres (<code class="inl">&gt;=</code>, <code class="inl">&lt;=</code>, <code class="inl">&lt;&gt;</code>) se reconocen como un solo token.</p></div>
+      <div class="grid2">
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>Token</th><th>Reconoce</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td class="m">TOKEN_BUSCAR · TOKEN_DE</td><td class="d">Inicio y origen</td><td class="m hl-kw">BUSCAR · DE</td></tr>
+              <tr><td class="m">TOKEN_DONDE</td><td class="d">Inicio del filtro</td><td class="m hl-kw">DONDE</td></tr>
+              <tr><td class="m">TOKEN_Y · TOKEN_O</td><td class="d">Conectores lógicos</td><td class="m hl-kw">Y · O</td></tr>
+              <tr><td class="m">TOKEN_ORDENAR · TOKEN_POR</td><td class="d">Ordenamiento</td><td class="m hl-kw">ORDENAR POR</td></tr>
+              <tr><td class="m">TOKEN_ASC · TOKEN_DESC</td><td class="d">Dirección del orden</td><td class="m hl-kw">DESC</td></tr>
+              <tr><td class="m">TOKEN_IDENTIFICADOR</td><td class="d">Tabla o campo</td><td class="m">estudiante, edad</td></tr>
+              <tr><td class="m">TOKEN_OPERADOR</td><td class="d">Comparación</td><td class="m hl-op">&gt;=</td></tr>
+              <tr><td class="m">TOKEN_NUMERO · TOKEN_DECIMAL</td><td class="d">Valores numéricos</td><td class="m hl-num">18 · 8.5</td></tr>
+              <tr><td class="m">TOKEN_TEXTO</td><td class="d">Texto entre comillas</td><td class="m hl-str">"Ana"</td></tr>
+              <tr><td class="m">TOKEN_COMA · TOKEN_FIN</td><td class="d">Separador y fin opcional</td><td class="m hl-op">,  ;</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>Ejemplo</h3>
+          <pre class="block" style="margin-bottom:12px" data-src>
+BUSCAR estudiante DONDE edad > 18</pre>
+          <pre class="block">TOKEN_BUSCAR(BUSCAR)
+TOKEN_IDENTIFICADOR(estudiante)
+TOKEN_DONDE(DONDE)
+TOKEN_IDENTIFICADOR(edad)
+TOKEN_OPERADOR(>)
+TOKEN_NUMERO(18)</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- E. Análisis sintáctico -->
+  <section id="sintaxis">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">E</span><span>Análisis sintáctico</span></div><h2>La gramática <em>y el árbol de cada consulta.</em></h2>
+        <p class="lead">El analizador sintáctico es descendente recursivo: cada regla de la gramática es un método. Como en SQL, <code class="inl">Y</code> se evalúa antes que <code class="inl">O</code>. Después, el análisis semántico comprueba la consulta contra la base de datos.</p></div>
+      <div class="grid2">
+<pre class="block"><span class="hl-str">&lt;consulta&gt;</span>  ::= <span class="hl-num">BUSCAR</span> <span class="hl-str">&lt;origen&gt;</span> [ <span class="hl-num">DONDE</span> <span class="hl-str">&lt;filtro&gt;</span> ]
+                [ <span class="hl-num">ORDENAR POR</span> IDENT [ <span class="hl-num">ASC</span> | <span class="hl-num">DESC</span> ] ] [ <span class="hl-num">";"</span> ]
+<span class="hl-str">&lt;origen&gt;</span>    ::= IDENT | <span class="hl-str">&lt;campos&gt;</span> <span class="hl-num">DE</span> IDENT
+<span class="hl-str">&lt;campos&gt;</span>    ::= IDENT { <span class="hl-num">","</span> IDENT }
+<span class="hl-str">&lt;filtro&gt;</span>    ::= <span class="hl-str">&lt;condicion&gt;</span> { ( <span class="hl-num">Y</span> | <span class="hl-num">O</span> ) <span class="hl-str">&lt;condicion&gt;</span> }
+<span class="hl-str">&lt;condicion&gt;</span> ::= IDENT <span class="hl-str">&lt;operador&gt;</span> <span class="hl-str">&lt;valor&gt;</span>
+<span class="hl-str">&lt;operador&gt;</span>  ::= <span class="hl-num">"&gt;"</span> | <span class="hl-num">"&lt;"</span> | <span class="hl-num">"&gt;="</span> | <span class="hl-num">"&lt;="</span> | <span class="hl-num">"="</span> | <span class="hl-num">"&lt;&gt;"</span>
+<span class="hl-str">&lt;valor&gt;</span>     ::= NUMERO | DECIMAL | TEXTO</pre>
+        <pre class="block">Consulta
+├─ BUSCAR → SELECT
+│  └─ Campos: * (todos)
+├─ Tabla → FROM
+│  └─ estudiante
+└─ DONDE → WHERE
+   └─ Condición: edad &gt; 18</pre>
+      </div>
+      <div class="tbl-wrap" style="margin-top:16px">
+        <table class="t">
+          <thead><tr><th>Validación semántica</th><th>Ejemplo que la rompe</th></tr></thead>
+          <tbody>
+            <tr><td>La tabla debe existir</td><td class="m">BUSCAR estudiantes</td></tr>
+            <tr><td>Cada campo debe pertenecer a la tabla</td><td class="m">… DONDE telefono = "6000"</td></tr>
+            <tr><td>Un campo numérico se compara con un número, uno de texto con un texto</td><td class="m">… DONDE edad &gt; "veinte"</td></tr>
+            <tr><td>Los textos solo se comparan con = o &lt;&gt;</td><td class="m">… DONDE nombre &gt; "Ana"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- F. Código generado -->
+  <section id="codigo">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">F</span><span>Código generado</span></div><h2>Cada consulta <em>se convierte en SQL.</em></h2>
+        <p class="lead">El proyecto de C# además muestra la consulta equivalente con LINQ y puede exportar un script <code class="inl">.sql</code> con las tablas y las consultas para ejecutarlo en SQL Server, MySQL o SQLite.</p></div>
+      <div class="tbl-wrap">
+        <table class="t">
+          <thead><tr><th>Lenguaje fuente</th><th>SQL generado</th></tr></thead>
+          <tbody id="tradTabla"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- G. Resultado -->
+  <section id="resultado">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">G</span><span>Resultado</span></div><h2>La consulta devuelve <em>las filas que cumplen.</em></h2>
+        <p class="lead">Resultado de <code class="inl">BUSCAR estudiante DONDE edad &gt; 18</code> sobre la base de datos de ejemplo. Es el mismo que da el SQL generado en SQLite.</p></div>
+      <div class="grid2">
+        <div class="tbl-wrap" id="resultadoEjemplo"></div>
+        <div class="panel">
+          <h3>Evidencia</h3>
+          <p>Las capturas de la ejecución en consola y el video del grupo van en la carpeta <code class="inl">evidencias/</code> del repositorio.</p>
+          <p>Para reproducirlo: abrir <code class="inl">CompiladorConsultas.sln</code> en Visual Studio, presionar F5 y elegir la opción 1 (casos correctos), 2 (casos con errores) o 6 (exportar el script SQL).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fases -->
+  <section id="fases">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">⇢</span><span>Flujo de compilación</span></div><h2>Qué fases implementa <em>este compilador.</em></h2>
+        <p class="lead">Las cinco primeras etapas están implementadas en el proyecto de C#. La ejecución en un gestor SQL real es opcional: el script exportado sirve para comprobarla.</p></div>
+      <div class="flow">
+        <div class="step"><span class="n">00 · ENTRADA</span><h3>Consulta</h3><p>Archivo .txt o texto escrito en el menú.</p><code>BUSCAR estudiante DONDE edad &gt; 18</code><span class="pill">Implementada</span></div>
+        <div class="step"><span class="n">01 · LÉXICO</span><h3>Tokens</h3><p>AnalizadorLexico.cs reconoce palabras clave, operadores y valores.</p><code>TOKEN_DONDE(DONDE)</code><span class="pill">Implementada</span></div>
+        <div class="step"><span class="n">02 · SINTÁCTICO</span><h3>Árbol</h3><p>AnalizadorSintactico.cs valida la gramática de forma recursiva.</p><code>SELECT · FROM · WHERE</code><span class="pill">Implementada</span></div>
+        <div class="step"><span class="n">03 · SEMÁNTICO</span><h3>Validaciones</h3><p>AnalizadorSemantico.cs revisa tabla, campos y tipos.</p><code>edad: entero ✓</code><span class="pill">Implementada</span></div>
+        <div class="step"><span class="n">04 · GENERACIÓN</span><h3>SQL</h3><p>GeneradorSQL.cs escribe el SQL y su versión en LINQ.</p><code>SELECT * FROM estudiante WHERE edad &gt; 18;</code><span class="pill">Implementada</span></div>
+        <div class="step"><span class="n">05 · RESULTADO</span><h3>Filas</h3><p>Ejecutor.cs ejecuta la consulta sobre la base de datos en memoria.</p><code>4 fila(s)</code><span class="pill">Implementada</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- H. Pruebas -->
+  <section id="pruebas">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">H</span><span>Pruebas</span></div><h2>Un caso correcto <em>y errores controlados.</em></h2>
+        <p class="lead">Cada error indica la fase que lo detectó, la línea, la columna y una sugerencia. Usa “Probar” para cargarlo en el laboratorio.</p></div>
+      <div class="tests">
+        <div class="test okc">
+          <span class="k">Caso correcto</span>
+          <pre data-src>
+BUSCAR estudiante DONDE edad > 18</pre>
+          <div class="exp"><b>Resultado esperado:</b> <span class="mono">SELECT * FROM estudiante WHERE edad &gt; 18;</span> devuelve 4 filas: Ana, Pedro, Sofía y Diego.</div>
+          <button class="btn btn-ghost btn-sm" type="button" data-probar="BUSCAR estudiante DONDE edad &gt; 18">Probar →</button>
+        </div>
+        <div class="test badc">
+          <span class="k">Caso incorrecto</span>
+          <pre data-src>
+BUSCAR estudiante DONDE edad ></pre>
+          <div class="exp"><b>Mensaje esperado:</b> Error sintáctico (línea 1, columna 31): Falta el valor después de "&gt;".<br>→ El valor puede ser un número o un texto entre comillas.</div>
+          <button class="btn btn-ghost btn-sm" type="button" data-probar="BUSCAR estudiante DONDE edad &gt;">Probar →</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <h3>Otros errores que detecta</h3>
+        <div class="errlist" style="margin-top:10px">
+          <div><code>buscar estudiante DONDE edad &gt; 18</code><span>Sintáctico: "buscar" no se reconoce como palabra clave. → BUSCAR va en mayúsculas</span></div>
+          <div><code>BUSCAR estudiantes DONDE edad &gt; 18</code><span>Semántico: La tabla "estudiantes" no existe. ¿Quisiste decir "estudiante"?</span></div>
+          <div><code>BUSCAR estudiante DONDE telefono = "6000-0000"</code><span>Semántico: La tabla "estudiante" no tiene un campo llamado "telefono".</span></div>
+          <div><code>BUSCAR estudiante DONDE edad &gt; "veinte"</code><span>Semántico: El campo "edad" es numérico y se compara con un texto.</span></div>
+          <div><code>BUSCAR estudiante DONDE nombre = Ana</code><span>Sintáctico: Falta el valor después de "=". → escríbelo entre comillas</span></div>
+          <div><code>BUSCAR estudiante DONDE edad # 18</code><span>Léxico: Símbolo no reconocido: '#'.</span></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" data-probar="errores" style="margin-top:14px">Probar todos en el laboratorio →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipo -->
+  <section id="equipo">
+    <div class="wrap">
+      <div class="sec-head"><div class="tag"><span class="letter">G3</span><span>Equipo y código fuente</span></div><h2>Grupo 3</h2></div>
+      <div class="team">
+        <div class="panel"><h3>Integrantes</h3><p>Ana Vallarino<br>Josimar Osorio</p></div>
+        <div class="panel"><h3>Código fuente</h3><p>Proyecto de Visual Studio en <code class="inl">proyectos-visual-studio/10-consultas-simples</code> del repositorio <span class="mono">Compiladores-UIP/Compiladores</span>.</p></div>
+        <div class="panel"><h3>Tecnologías</h3><p>C# y .NET 8 para el compilador, SQL como lenguaje destino. HTML, CSS y JavaScript para esta página.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span><b style="color:var(--fg)">nexo.</b> · Universidad Interamericana de Panamá · Compiladores 2026</span><span class="mono">10 · Consultas simples → SQL</span></div></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =====================================================================
+   Mini-Compilador 10 · Consultas simples  (misma lógica que el proyecto C#)
+   BUSCAR estudiante DONDE edad > 18  →  SELECT * FROM estudiante WHERE edad > 18;
+   ===================================================================== */
+const Compilador = (() => {
+  const CLAVES = { BUSCAR: 'Buscar', DE: 'De', DONDE: 'Donde', Y: 'Y', O: 'O', ORDENAR: 'Ordenar', POR: 'Por', ASC: 'Asc', DESC: 'Desc' };
+  const NOMBRES = { Identificador: 'TOKEN_IDENTIFICADOR', Operador: 'TOKEN_OPERADOR', NumeroEntero: 'TOKEN_NUMERO', NumeroDecimal: 'TOKEN_DECIMAL', Texto: 'TOKEN_TEXTO', Coma: 'TOKEN_COMA', FinSentencia: 'TOKEN_FIN', Desconocido: 'TOKEN_DESCONOCIDO' };
+  const CLASES = { Identificador: 'hl-id', Operador: 'hl-op', NumeroEntero: 'hl-num', NumeroDecimal: 'hl-num', Texto: 'hl-str', Coma: 'hl-op', FinSentencia: 'hl-op', Desconocido: 'hl-bad' };
+  const reservada = t => Object.values(CLAVES).includes(t.tipo);
+  const esValor = t => t && ['NumeroEntero', 'NumeroDecimal', 'Texto'].includes(t.tipo);
+  const letra = ch => /[\p{L}_]/u.test(ch), alnum = ch => /[\p{L}\p{N}_]/u.test(ch), digito = ch => /[0-9]/.test(ch);
+
+  /* Base de datos de ejemplo (igual a BaseDeDatos.cs) */
+  const BD = {
+    estudiante: {
+      campos: [['id', 'Entero'], ['nombre', 'Texto'], ['edad', 'Entero'], ['carrera', 'Texto'], ['promedio', 'Decimal']],
+      filas: [[1, 'Ana', 20, 'Sistemas', 91.5], [2, 'Luis', 17, 'Industrial', 78.0], [3, 'Marta', 18, 'Sistemas', 85.0],
+        [4, 'Pedro', 22, 'Civil', 69.5], [5, 'Sofía', 19, 'Industrial', 88.0], [6, 'Diego', 21, 'Sistemas', 74.5]]
+    },
+    curso: {
+      campos: [['codigo', 'Texto'], ['nombre', 'Texto'], ['creditos', 'Entero'], ['cupos', 'Entero']],
+      filas: [['INF-301', 'Compiladores', 4, 30], ['INF-210', 'Base de Datos', 4, 25], ['MAT-101', 'Cálculo I', 5, 40], ['INF-150', 'Programación I', 3, 35]]
+    }
+  };
+  const formato = (v, tipo) => tipo === 'Decimal' ? Number(v).toFixed(1) : String(v);
+  const campoDe = (tabla, n) => BD[tabla].campos.find(c => c[0] === n);
+  const indice = (tabla, n) => BD[tabla].campos.findIndex(c => c[0] === n);
+
+  function compilar(fuente) {
+    const lineas = fuente.replace(/\r/g, '').split('\n');
+    const tokens = [], errores = [];
+    const err = (fase, linea, col, len, msg, pista) => errores.push({ fase, linea, col, len: Math.max(1, len), msg, pista });
+    const tok = (tipo, lexema, linea, col) => tokens.push({
+      tipo, lexema, linea, col,
+      nombre: NOMBRES[tipo] || 'TOKEN_' + tipo.toUpperCase(),
+      cls: CLASES[tipo] || 'hl-kw'
+    });
+
+    /* ---------- 1. Léxico ---------- */
+    lineas.forEach((txt, i) => {
+      const ln = i + 1; let c = 0;
+      while (c < txt.length) {
+        const ch = txt[c], col = c + 1;
+        if (/\s/.test(ch)) { c++; continue; }
+        if (ch === '/' && txt[c + 1] === '/') { tokens.push({ tipo: 'Comentario', lexema: txt.slice(c), linea: ln, col, cls: 'hl-com', oculto: true }); break; }
+        if (letra(ch)) {
+          let j = c; while (j < txt.length && alnum(txt[j])) j++;
+          const w = txt.slice(c, j);
+          tok(CLAVES[w] || 'Identificador', w, ln, col); c = j; continue;
+        }
+        if (digito(ch)) {
+          let j = c; while (j < txt.length && digito(txt[j])) j++;
+          let dec = false;
+          if (txt[j] === '.' && digito(txt[j + 1] || '')) { dec = true; j++; while (j < txt.length && digito(txt[j])) j++; }
+          if (j < txt.length && letra(txt[j])) {
+            while (j < txt.length && alnum(txt[j])) j++;
+            err('Léxico', ln, col, j - c, `"${txt.slice(c, j)}" no es válido: un nombre no puede empezar con un número.`, 'Revisa que haya un espacio entre el número y la palabra siguiente.');
+            tok('Desconocido', txt.slice(c, j), ln, col); c = j; continue;
+          }
+          tok(dec ? 'NumeroDecimal' : 'NumeroEntero', txt.slice(c, j), ln, col); c = j; continue;
+        }
+        if (ch === '"') {
+          const k = txt.indexOf('"', c + 1);
+          if (k === -1) { err('Léxico', ln, col, txt.length - c, 'Texto sin cerrar: falta la comilla doble final.', 'Cierra el texto con " al final.'); tok('Desconocido', txt.slice(c), ln, col); break; }
+          tok('Texto', txt.slice(c, k + 1), ln, col); c = k + 1; continue;
+        }
+        if ('><=!'.includes(ch)) {
+          const dos = txt.substr(c, 2);
+          if (['>=', '<=', '<>', '!='].includes(dos)) { tok('Operador', dos, ln, col); c += 2; continue; }
+          if (ch !== '!') { tok('Operador', ch, ln, col); c++; continue; }
+        }
+        if (ch === ',') { tok('Coma', ',', ln, col); c++; continue; }
+        if (ch === ';') { tok('FinSentencia', ';', ln, col); c++; continue; }
+        err('Léxico', ln, col, 1, `Símbolo no reconocido: '${ch}'.`, 'Solo se admiten palabras, números, textos entre comillas, comas y los operadores > < >= <= = <>.');
+        tok('Desconocido', ch, ln, col); c++;
+      }
+    });
+
+    /* ---------- 2. Sintáctico (descendente recursivo) ---------- */
+    const conErrorLex = new Set(errores.map(e => e.linea));
+    const porLinea = new Map();
+    tokens.filter(t => !t.oculto).forEach(t => { if (!porLinea.has(t.linea)) porLinea.set(t.linea, []); porLinea.get(t.linea).push(t); });
+    const consultas = [];
+    [...porLinea.keys()].sort((a, b) => a - b).forEach(ln => {
+      if (conErrorLex.has(ln)) return;
+      const t = porLinea.get(ln); let p = 0;
+      const fin = t[t.length - 1].col + t[t.length - 1].lexema.length;
+      const actual = () => t[p];
+      const FALLO = {};
+      const fallar = (tk, msg, pista) => { err('Sintáctico', ln, tk ? tk.col : fin, tk ? tk.lexema.length : 1, msg, pista); throw FALLO; };
+      const esperar = (tipo, msg, pista) => {
+        const a = actual();
+        if (!a || a.tipo !== tipo) {
+          if (a && reservada(a)) fallar(a, `"${a.lexema}" es una palabra reservada y no puede usarse aquí. ${msg}`, pista);
+          fallar(a, msg, pista);
+        }
+        return t[p++];
+      };
+      const condicion = () => {
+        const campo = esperar('Identificador', 'Se esperaba el nombre de un campo en la condición.', 'Ejemplo: DONDE edad > 18');
+        if (!actual() || actual().tipo !== 'Operador') fallar(actual(), `Falta el operador de comparación después de "${campo.lexema}".`, 'Usa uno de estos: >  <  >=  <=  =  <>');
+        const op = t[p++];
+        if (!esValor(actual())) {
+          const a = actual();
+          fallar(a, `Falta el valor después de "${op.lexema}".`, a && a.tipo === 'Identificador' ? `Si "${a.lexema}" es un texto, escríbelo entre comillas: "${a.lexema}".` : 'El valor puede ser un número o un texto entre comillas.');
+        }
+        return { campo, op, valor: t[p++] };
+      };
+      try {
+        const q = { linea: ln, fuente: lineas[ln - 1].trim(), campos: [], conds: [], conectores: [], orden: null, desc: false };
+        if (actual().tipo !== 'Buscar') {
+          if (actual().lexema.toUpperCase() === 'BUSCAR') fallar(actual(), `"${actual().lexema}" no se reconoce como palabra clave.`, 'Las palabras clave van en mayúsculas: BUSCAR.');
+          fallar(actual(), `Una consulta debe empezar con BUSCAR y empieza con "${actual().lexema}".`, 'Ejemplo: BUSCAR estudiante DONDE edad > 18');
+        }
+        p++;
+        const primero = esperar('Identificador', 'Falta el nombre de la tabla después de BUSCAR.', 'Ejemplo: BUSCAR estudiante');
+        if (actual() && (actual().tipo === 'Coma' || actual().tipo === 'De')) {
+          q.campos.push(primero);
+          while (actual() && actual().tipo === 'Coma') { p++; q.campos.push(esperar('Identificador', 'Falta un nombre de campo después de la coma.', 'Ejemplo: BUSCAR nombre, edad DE estudiante')); }
+          if (!actual() || actual().tipo !== 'De') fallar(actual(), 'Después de la lista de campos se esperaba DE.', 'Ejemplo: BUSCAR nombre, edad DE estudiante');
+          p++;
+          q.tabla = esperar('Identificador', 'Falta el nombre de la tabla después de DE.', 'Ejemplo: BUSCAR nombre DE estudiante');
+        } else q.tabla = primero;
+        if (actual() && actual().tipo === 'Donde') {
+          p++; q.conds.push(condicion());
+          while (actual() && (actual().tipo === 'Y' || actual().tipo === 'O')) { q.conectores.push(t[p++]); q.conds.push(condicion()); }
+        }
+        if (actual() && actual().tipo === 'Ordenar') {
+          p++;
+          if (!actual() || actual().tipo !== 'Por') fallar(actual(), 'Después de ORDENAR se esperaba POR.', 'Ejemplo: ORDENAR POR edad DESC');
+          p++;
+          q.orden = esperar('Identificador', 'Falta el campo por el que se va a ordenar.', 'Ejemplo: ORDENAR POR edad');
+          if (actual() && (actual().tipo === 'Asc' || actual().tipo === 'Desc')) { q.desc = actual().tipo === 'Desc'; p++; }
+        }
+        if (actual() && actual().tipo === 'FinSentencia') p++;
+        if (actual()) {
+          const up = actual().lexema.toUpperCase();
+          const pista = ['DONDE', 'Y', 'O', 'ORDENAR', 'DE'].includes(up) ? `Las palabras clave van en mayúsculas: ${up}.`
+            : q.conds.length ? 'Para unir condiciones usa Y u O.' : 'Para filtrar usa DONDE, por ejemplo: BUSCAR estudiante DONDE edad > 18';
+          fallar(actual(), `No se esperaba "${actual().lexema}" en esta posición.`, pista);
+        }
+        consultas.push(q);
+      } catch (e) { if (e !== FALLO) throw e; }
+    });
+
+    /* ---------- 3. Semántico ---------- */
+    const verificaciones = [], validas = [];
+    const errSem = (tk, msg, pista) => err('Semántico', tk.linea, tk.col, tk.lexema.length, msg, pista);
+    consultas.forEach(q => {
+      const antes = errores.length, notas = [];
+      const tabla = q.tabla.lexema;
+      if (!BD[tabla]) {
+        const disp = Object.keys(BD).join(', ');
+        const parecida = BD[tabla.replace(/s+$/, '')] ? tabla.replace(/s+$/, '') : null;
+        errSem(q.tabla, `La tabla "${tabla}" no existe.`, parecida ? `¿Quisiste decir "${parecida}"? Las tablas disponibles son: ${disp}.` : `Las tablas disponibles son: ${disp}.`);
+        return;
+      }
+      notas.push(`la tabla "${tabla}" existe.`);
+      const valido = tk => {
+        if (campoDe(tabla, tk.lexema)) return true;
+        errSem(tk, `La tabla "${tabla}" no tiene un campo llamado "${tk.lexema}".`, `Campos disponibles: ${BD[tabla].campos.map(c => c[0]).join(', ')}.`);
+        return false;
+      };
+      q.campos.forEach(c => { if (valido(c)) notas.push(`el campo "${c.lexema}" pertenece a ${tabla}.`); });
+      q.conds.forEach(c => {
+        if (!valido(c.campo)) return;
+        const [nombre, tipo] = campoDe(tabla, c.campo.lexema);
+        const num = c.valor.tipo === 'NumeroEntero' || c.valor.tipo === 'NumeroDecimal';
+        if (tipo === 'Texto' && num) return errSem(c.valor, `El campo "${nombre}" es de texto y se compara con un número.`, `Escribe el valor entre comillas, por ejemplo: ${nombre} = "${c.valor.lexema}"`);
+        if (tipo !== 'Texto' && !num) return errSem(c.valor, `El campo "${nombre}" es numérico y se compara con un texto.`, `Quita las comillas y escribe un número, por ejemplo: ${nombre} > 18`);
+        if (tipo === 'Entero' && c.valor.tipo === 'NumeroDecimal') return errSem(c.valor, `El campo "${nombre}" es ENTERO y el valor ${c.valor.lexema} tiene decimales.`, 'Usa un número entero.');
+        if (tipo === 'Texto' && !['=', '<>', '!='].includes(c.op.lexema)) return errSem(c.op, `El operador "${c.op.lexema}" no se puede usar con el texto "${nombre}".`, 'Para textos usa = (igual) o <> (diferente).');
+        notas.push(`la condición "${c.campo.lexema} ${c.op.lexema} ${c.valor.lexema}" compara tipos compatibles.`);
+      });
+      if (q.orden && valido(q.orden)) notas.push(`se puede ordenar por "${q.orden.lexema}".`);
+      if (errores.length === antes) { validas.push(q); notas.forEach(n => verificaciones.push(`Línea ${q.linea}: ${n}`)); }
+    });
+
+    errores.sort((a, b) => a.linea - b.linea || a.col - b.col);
+    const ok = errores.length === 0 && consultas.length > 0;
+
+    /* ---------- Árbol ---------- */
+    const arbol = consultas.map(q => {
+      const ramas = [['BUSCAR → SELECT', [q.campos.length ? 'Campos: ' + q.campos.map(c => c.lexema).join(', ') : 'Campos: * (todos)']], ['Tabla → FROM', [q.tabla.lexema]]];
+      if (q.conds.length) ramas.push(['DONDE → WHERE', q.conds.map((c, i) => `${i ? q.conectores[i - 1].lexema + ' ' : ''}Condición: ${c.campo.lexema} ${c.op.lexema} ${c.valor.lexema}`)]);
+      if (q.orden) ramas.push(['ORDENAR POR → ORDER BY', [q.orden.lexema + (q.desc ? ' DESC' : ' ASC')]]);
+      const out = [`Consulta (línea ${q.linea})`];
+      ramas.forEach(([txt, hijos], i) => {
+        const ult = i === ramas.length - 1;
+        out.push(`${ult ? '└─' : '├─'} ${txt}`);
+        hijos.forEach((h, j) => out.push(`${ult ? '   ' : '│  '}${j === hijos.length - 1 ? '└─' : '├─'} ${h}`));
+      });
+      return out.join('\n');
+    }).join('\n\n');
+
+    /* ---------- 4. Generación SQL y 5. Ejecución ---------- */
+    const sqlCond = c => `${c.campo.lexema} ${c.op.lexema === '!=' ? '<>' : c.op.lexema} ${c.valor.tipo === 'Texto' ? "'" + c.valor.lexema.slice(1, -1).replace(/'/g, "''") + "'" : c.valor.lexema}`;
+    const sql = q => {
+      let s = `SELECT ${q.campos.length ? q.campos.map(c => c.lexema).join(', ') : '*'} FROM ${q.tabla.lexema}`;
+      if (q.conds.length) s += ' WHERE ' + q.conds.map((c, i) => (i ? (q.conectores[i - 1].tipo === 'Y' ? 'AND ' : 'OR ') : '') + sqlCond(c)).join(' ');
+      if (q.orden) s += ` ORDER BY ${q.orden.lexema}${q.desc ? ' DESC' : ' ASC'}`;
+      return s + ';';
+    };
+    const comparar = (a, b) => typeof a === 'string' && typeof b === 'string'
+      ? a.toLowerCase().localeCompare(b.toLowerCase(), 'es', { sensitivity: 'accent' })
+      : Number(a) - Number(b);
+    const evaluar = (tabla, fila, c) => {
+      const dato = fila[indice(tabla, c.campo.lexema)];
+      const valor = c.valor.tipo === 'Texto' ? c.valor.lexema.slice(1, -1) : parseFloat(c.valor.lexema);
+      const r = comparar(dato, valor);
+      return ({ '>': r > 0, '<': r < 0, '>=': r >= 0, '<=': r <= 0, '=': r === 0 })[c.op.lexema] ?? r !== 0;
+    };
+    const cumple = (q, fila) => {
+      if (!q.conds.length) return true;
+      const grupos = [[q.conds[0]]];
+      q.conectores.forEach((cx, i) => { if (cx.tipo === 'O') grupos.push([]); grupos[grupos.length - 1].push(q.conds[i + 1]); });
+      return grupos.some(g => g.every(c => evaluar(q.tabla.lexema, fila, c)));
+    };
+
+    let codigo = '', traducciones = [], tablas = [];
+    if (ok) {
+      consultas.forEach(q => {
+        const s = sql(q);
+        traducciones.push([q.fuente, s]);
+        const tb = q.tabla.lexema, def = BD[tb];
+        let filas = def.filas.filter(f => cumple(q, f));
+        if (q.orden) { const i = indice(tb, q.orden.lexema); filas = [...filas].sort((a, b) => comparar(a[i], b[i]) * (q.desc ? -1 : 1)); }
+        const cols = q.campos.length ? q.campos.map(c => c.lexema) : def.campos.map(c => c[0]);
+        const idx = cols.map(c => indice(tb, c));
+        tablas.push({ titulo: s, cols, rows: filas.map(f => idx.map(i => formato(f[i], def.campos[i][1]))) });
+      });
+      codigo = traducciones.map(t => t[1]).join('\n');
+    }
+
+    return {
+      lineas, tokens, errores, ok, arbol, verificaciones, simbolos: null,
+      lenguaje: 'SQL', codigo, traducciones,
+      resultado: { tablas },
+      resumen: { instrucciones: consultas.length, simbolos: validas.length }
+    };
+  }
+
+  return { compilar, BD, formato };
+})();
+
+
+const CONFIG = {
+  lenguaje: 'SQL',
+  unidad: 'consultas',
+  unidadUna: 'una consulta',
+  pistaVacia: 'Prueba con BUSCAR estudiante DONDE edad > 18',
+  resumenSemantico: r => `${r.resumen.simbolos} válida(s)`,
+  resumenResultado: r => `${r.resultado.tablas.reduce((n, t) => n + t.rows.length, 0)} fila(s)`,
+  hero: [
+    ['BUSCAR estudiante DONDE edad > 18', 'SELECT * FROM estudiante WHERE edad > 18;'],
+    ['BUSCAR nombre DE estudiante', 'SELECT nombre FROM estudiante;'],
+    ['BUSCAR curso DONDE creditos >= 4', 'SELECT * FROM curso WHERE creditos >= 4;'],
+    ['BUSCAR estudiante ORDENAR POR edad DESC', 'SELECT * FROM estudiante ORDER BY edad DESC;']
+  ],
+  ejemplos: [
+    { id: 'correcto', titulo: 'Casos correctos', desc: 'Filtros, campos y orden', tab: 'run', codigo:
+`// Mini-Compilador 10 · Consultas simples (casos correctos)
+BUSCAR estudiante DONDE edad > 18
+BUSCAR nombre, carrera DE estudiante DONDE carrera = "Sistemas" Y promedio >= 80
+BUSCAR estudiante DONDE edad < 18 O promedio < 70 ORDENAR POR edad DESC
+BUSCAR curso` },
+    { id: 'basico', titulo: 'Consulta del portal', desc: 'BUSCAR … DONDE edad > 18', tab: 'code', codigo: 'BUSCAR estudiante DONDE edad > 18' },
+    { id: 'cursos', titulo: 'Tabla curso', desc: 'Otra tabla y ORDENAR POR', tab: 'run', codigo:
+`BUSCAR nombre, creditos DE curso DONDE creditos >= 4 ORDENAR POR nombre
+BUSCAR curso DONDE cupos < 30 O codigo = "MAT-101"` },
+    { id: 'errores', titulo: 'Casos con errores', desc: 'Uno de cada fase', tab: 'err', codigo:
+`// Mini-Compilador 10 · Consultas simples (casos incorrectos)
+BUSCAR estudiante DONDE edad >
+buscar estudiante DONDE edad > 18
+BUSCAR estudiantes DONDE edad > 18
+BUSCAR estudiante DONDE telefono = "6000-0000"
+BUSCAR estudiante DONDE edad > "veinte"
+BUSCAR estudiante DONDE nombre = Ana
+BUSCAR estudiante DONDE edad # 18` }
+  ]
+};
+
+/* Contenido generado a partir del compilador: tablas de la BD, sección F y G */
+(() => {
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const tabla = (cols, rows) => `<table class="t"><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td class="m">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const { BD, formato } = Compilador;
+  document.getElementById('tablasBD').innerHTML = Object.entries(BD).map(([n, t]) =>
+    `<div class="panel" style="padding:0;overflow:hidden"><div style="padding:14px 16px 6px"><h3 style="margin:0">${n}</h3><p style="font-size:12.5px;margin:2px 0 0" class="mono">${t.campos.map(c => `${c[0]} (${c[1].toLowerCase()})`).join(' · ')}</p></div><div style="overflow-x:auto">${tabla(t.campos.map(c => c[0]), t.filas.map(f => f.map((v, i) => formato(v, t.campos[i][1]))))}</div></div>`).join('');
+  const r = Compilador.compilar(CONFIG.ejemplos[0].codigo);
+  document.getElementById('tradTabla').innerHTML = r.traducciones.map(([a, b]) => `<tr><td class="m" data-src>${esc(a)}</td><td class="m" data-dst="SQL">${esc(b)}</td></tr>`).join('');
+  const t0 = Compilador.compilar('BUSCAR estudiante DONDE edad > 18').resultado.tablas[0];
+  document.getElementById('resultadoEjemplo').innerHTML = tabla(t0.cols, t0.rows) + `<div style="padding:10px 16px;font-size:12.5px;color:var(--dim);border-top:1px solid var(--line)">${t0.rows.length} fila(s)</div>`;
+})();
+
+/* =====================================================================
+   Interfaz del laboratorio (común a los dos compiladores).
+   Usa Compilador.compilar(codigo) y la configuración CONFIG de cada página.
+   ===================================================================== */
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  /* Resalta una línea usando los tokens y subraya las zonas con error */
+  function resaltarLinea(txt, toks, errs) {
+    const cls = new Array(txt.length).fill('');
+    toks.forEach(t => { for (let i = t.col - 1; i < t.col - 1 + t.lexema.length && i < txt.length; i++) cls[i] = t.cls || ''; });
+    const mal = new Array(txt.length + 1).fill(false);
+    errs.forEach(e => { for (let i = e.col - 1; i < e.col - 1 + e.len; i++) mal[Math.min(i, txt.length)] = true; });
+    let out = '', cur = null, buf = '';
+    const flush = () => { if (!buf) return; const k = [cur[0], cur[1] ? 'hl-err' : ''].filter(Boolean).join(' '); out += k ? `<span class="${k}">${esc(buf)}</span>` : esc(buf); buf = ''; };
+    for (let i = 0; i < txt.length; i++) { if (!cur || cur[0] !== cls[i] || cur[1] !== mal[i]) { flush(); cur = [cls[i], mal[i]]; } buf += txt[i]; }
+    flush();
+    if (mal[txt.length] && !errs.some(e => e.col - 1 < txt.length)) out += '<span class="hl-err">&nbsp;</span>';
+    return out;
+  }
+  function resaltarFuente(codigo, r) {
+    const res = r || Compilador.compilar(codigo);
+    return codigo.split('\n').map((l, i) => resaltarLinea(l, res.tokens.filter(t => t.linea === i + 1), (r ? r.errores : []).filter(e => e.linea === i + 1))).join('\n');
+  }
+  /* Resaltado del código destino (C# o SQL) */
+  function resaltarDestino(code, lang) {
+    const kws = lang === 'SQL'
+      ? [/\b(SELECT|FROM|WHERE|AND|OR|ORDER|BY|ASC|DESC)\b/g, 'cs-kw']
+      : [/\b(using|class|static|void|true|false|new|var)\b/g, 'cs-kw'];
+    return esc(code).split(/("[^"\n]*"|'[^'\n]*')/).map((part, i) => {
+      if (i % 2) return `<span class="hl-str">${part}</span>`;
+      let p = part.replace(kws[0], `<span class="${kws[1]}">$1</span>`);
+      if (lang !== 'SQL') p = p.replace(/\b(int|double|string|bool)\b/g, '<span class="cs-ty">$1</span>');
+      return p.replace(/(?<![\w-])(\d+(?:\.\d+)?)(?![\w-])/g, '<span class="hl-num">$1</span>');
+    }).join('');
+  }
+  window.LabUI = { resaltarFuente, resaltarDestino, esc };
+
+  const src = $('#src'), hl = $('#hl'), gut = $('#gutter'), out = $('#out');
+  let tab = 'tok', ultimo = null;
+
+  const sync = () => { hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft; gut.scrollTop = src.scrollTop; };
+  src.addEventListener('scroll', sync);
+  src.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); src.setRangeText('    ', src.selectionStart, src.selectionEnd, 'end'); compilar(); } });
+  let tmr; src.addEventListener('input', () => { pintar(null); clearTimeout(tmr); tmr = setTimeout(compilar, 140); });
+
+  function pintar(r) {
+    const txt = src.value;
+    hl.innerHTML = resaltarFuente(txt, r) + '\n ';
+    const malas = new Set((r ? r.errores : []).map(e => e.linea));
+    gut.innerHTML = txt.split('\n').map((_, i) => `<div class="${malas.has(i + 1) ? 'bad' : ''}">${i + 1}</div>`).join('') + '<div>&nbsp;</div>';
+    sync();
+  }
+
+  function compilar() {
+    const r = Compilador.compilar(src.value); ultimo = r; pintar(r);
+    const n = f => r.errores.filter(e => e.fase === f).length;
+    const vis = r.tokens.filter(t => !t.oculto);
+    const fases = [
+      ['01', 'Léxico', n('Léxico'), `${vis.length} tokens`],
+      ['02', 'Sintáctico', n('Sintáctico'), `${r.resumen.instrucciones} ${CONFIG.unidad}`],
+      ['03', 'Semántico', n('Semántico'), CONFIG.resumenSemantico(r)],
+      ['04', 'Generación', r.ok ? 0 : -1, r.ok ? `${r.traducciones.length} línea(s) ${r.lenguaje}` : 'En espera'],
+      ['05', 'Resultado', r.ok ? 0 : -1, r.ok ? CONFIG.resumenResultado(r) : 'En espera']
+    ];
+    $('#phases').innerHTML = fases.map(([k, nombre, e, ok]) =>
+      `<div class="phase ${e > 0 ? 'bad' : e < 0 ? 'skip' : ''}"><span class="n">FASE ${k}</span><b>${nombre}</b><small>${e > 0 ? e + (e === 1 ? ' error' : ' errores') : ok}</small></div>`).join('');
+    $('#cTok').textContent = vis.length;
+    const ce = $('#cErr'); ce.textContent = r.errores.length; ce.className = 'cnt' + (r.errores.length ? ' bad' : '');
+    $('#status').innerHTML = r.ok
+      ? `<span class="pill">Compilado</span><span>Sin errores · ${r.traducciones.length} ${CONFIG.unidad} traducidas a ${r.lenguaje}</span>`
+      : r.resumen.instrucciones === 0 && !r.errores.length
+        ? `<span class="pill off">Listo</span><span>Escribe ${CONFIG.unidadUna} para empezar</span>`
+        : `<span class="pill bad">${r.errores.length} ${r.errores.length === 1 ? 'error' : 'errores'}</span><span>Corrige los errores para generar el código ${r.lenguaje}</span>`;
+    render();
+  }
+
+  const vacio = (big, small, extra = '') => `<div class="empty"><span class="big">${big}</span><span>${small}</span>${extra}</div>`;
+  const tabla = (cols, rows) => `<table class="t"><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td class="m">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const bloqueado = () => vacio(`Esta fase espera a que no haya errores`, `Hay ${ultimo.errores.length} ${ultimo.errores.length === 1 ? 'error' : 'errores'} en el código.`, '<button class="btn btn-ghost btn-sm" type="button" data-go="err">Ver errores</button>');
+
+  function render() {
+    const r = ultimo;
+    document.querySelectorAll('#tabs .tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.t === tab)));
+    if (tab === 'tok') {
+      const vis = r.tokens.filter(t => !t.oculto);
+      out.innerHTML = vis.length
+        ? `<table class="t"><thead><tr><th>Línea:col</th><th>Lexema</th><th>Token</th></tr></thead><tbody>${vis.map(t =>
+          `<tr><td class="m" style="color:var(--dim)">${t.linea}:${t.col}</td><td class="m"><span class="${t.cls}">${esc(t.lexema)}</span></td><td class="m" ${t.tipo === 'Desconocido' ? 'style="color:var(--red)"' : ''}>${t.nombre}</td></tr>`).join('')}</tbody></table>`
+        : vacio('Sin tokens', 'El analizador léxico todavía no tiene nada que leer.');
+    } else if (tab === 'tree') {
+      out.innerHTML = r.arbol ? `<pre>${esc(r.arbol)}</pre>` : vacio('Sin árbol', r.errores.length ? 'Ninguna línea pasó el análisis sintáctico.' : 'Escribe una instrucción para construir el árbol.');
+    } else if (tab === 'sem') {
+      const sim = r.simbolos ? `<div class="blk"><div class="cap" style="color:var(--muted)">TABLA DE SÍMBOLOS</div><div class="mini">${tabla(r.simbolos.cols, r.simbolos.rows)}</div><div class="rows"></div></div>` : '';
+      const ver = r.verificaciones.length ? `<ul class="checks">${r.verificaciones.map(v => `<li>${esc(v)}</li>`).join('')}</ul>` : '';
+      const semErr = r.errores.filter(e => e.fase === 'Semántico').length;
+      out.innerHTML = (ver || sim)
+        ? ver + sim + (semErr ? `<div class="blk"><button class="btn btn-ghost btn-sm" type="button" data-go="err">Ver ${semErr} error(es) semántico(s)</button></div>` : '')
+        : vacio('Nada que validar todavía', r.errores.length ? 'Corrige los errores léxicos o sintácticos primero.' : 'Las validaciones aparecen al compilar.');
+    } else if (tab === 'code') {
+      out.innerHTML = r.ok
+        ? `<pre>${resaltarDestino(r.codigo, r.lenguaje)}</pre>`
+        : r.errores.length ? bloqueado() : vacio('Nada que traducir', CONFIG.pistaVacia);
+    } else if (tab === 'run') {
+      if (!r.ok) out.innerHTML = r.errores.length ? bloqueado() : vacio('Nada que ejecutar', CONFIG.pistaVacia);
+      else if (r.resultado.consola) {
+        const c = r.resultado.consola;
+        out.innerHTML = c.length
+          ? `<pre class="console"><span class="dim">$ dotnet run</span>\n${c.map(esc).join('\n')}\n<span class="pr">▌</span></pre>`
+          : vacio('El programa no imprime nada', 'Agrega una línea IMPRIMIR para ver la salida.');
+      } else {
+        out.innerHTML = r.resultado.tablas.map(t => `<div class="blk"><div class="cap">${esc(t.titulo)}</div>${t.rows.length ? `<div class="mini">${tabla(t.cols, t.rows)}</div>` : ''}<div class="rows">${t.rows.length ? t.rows.length + ' fila(s)' : '0 filas: ningún registro cumple la condición'}</div></div>`).join('');
+      }
+    } else if (tab === 'err') {
+      out.innerHTML = r.errores.length
+        ? `<ul class="errs">${r.errores.map(e => `<li data-line="${e.linea}" data-col="${e.col}"><span class="where"><b>Error ${e.fase.toLowerCase()}</b><span>línea ${e.linea}, columna ${e.col}</span></span><span>${esc(e.msg)}</span>${e.pista ? `<span class="hint">${esc(e.pista)}</span>` : ''}</li>`).join('')}</ul>`
+        : vacio('Sin errores', 'Todas las fases terminaron bien.');
+    }
+  }
+
+  $('#tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) { tab = b.dataset.t; render(); } });
+  out.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]'); if (g) { tab = g.dataset.go; render(); return; }
+    const li = e.target.closest('li[data-line]'); if (!li) return;
+    const ln = +li.dataset.line, col = +li.dataset.col, ls = src.value.split('\n');
+    let pos = 0; for (let i = 0; i < ln - 1; i++) pos += ls[i].length + 1;
+    src.focus(); src.setSelectionRange(pos + col - 1, pos + ls[ln - 1].length); src.scrollTop = Math.max(0, (ln - 4) * 24);
+  });
+
+  function cargar(codigo, irA) {
+    src.value = codigo; src.scrollTop = 0; compilar();
+    if (irA) { tab = irA; render(); }
+  }
+  window.cargarEnLaboratorio = (codigo, irA) => { cargar(codigo, irA); document.getElementById('laboratorio').scrollIntoView({ block: 'start' }); };
+
+  /* Botones de ejemplos */
+  const exBox = $('#examples');
+  exBox.innerHTML = CONFIG.ejemplos.map((x, i) => `<button class="ex${i === 0 ? ' on' : ''}" type="button" data-i="${i}"><b>${esc(x.titulo)}</b><span>${esc(x.desc)}</span></button>`).join('');
+  exBox.addEventListener('click', e => {
+    const b = e.target.closest('.ex'); if (!b) return;
+    exBox.querySelectorAll('.ex').forEach(x => x.classList.toggle('on', x === b));
+    const x = CONFIG.ejemplos[+b.dataset.i]; cargar(x.codigo, x.tab);
+  });
+  $('#btnClear').addEventListener('click', () => { exBox.querySelectorAll('.ex').forEach(x => x.classList.remove('on')); cargar(''); src.focus(); });
+
+  /* Copiar el código generado */
+  const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1700); };
+  $('#btnCopy').addEventListener('click', () => {
+    if (!ultimo || !ultimo.ok) { toast('Corrige los errores antes de copiar'); return; }
+    const fallback = () => { tab = 'code'; render(); const pre = out.querySelector('pre'); const rg = document.createRange(); rg.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); toast('Código seleccionado: usa Ctrl+C'); };
+    try { navigator.clipboard.writeText(ultimo.codigo).then(() => toast(`Código ${ultimo.lenguaje} copiado`), fallback); } catch (_) { fallback(); }
+  });
+
+  /* Botones "Probar" de la sección de pruebas */
+  document.querySelectorAll('[data-probar]').forEach(b => b.addEventListener('click', () => {
+    exBox.querySelectorAll('.ex').forEach(x => x.classList.remove('on'));
+    const x = CONFIG.ejemplos.find(e => e.id === b.dataset.probar) || { codigo: b.dataset.probar };
+    const irA = x.tab || (Compilador.compilar(x.codigo).errores.length ? 'err' : 'run');
+    window.cargarEnLaboratorio(x.codigo, irA);
+  }));
+
+  /* Resaltar bloques de código estáticos de la página */
+  document.querySelectorAll('[data-src]').forEach(el => { el.innerHTML = resaltarFuente(el.textContent.replace(/^\n/, '')); });
+  document.querySelectorAll('[data-dst]').forEach(el => { el.innerHTML = resaltarDestino(el.textContent.replace(/^\n/, ''), el.dataset.dst); });
+
+  /* Hero: traducción animada */
+  (() => {
+    let i = 0;
+    const show = () => {
+      const [a, b] = CONFIG.hero[i];
+      $('#heroIn').innerHTML = resaltarFuente(a);
+      $('#heroOut').innerHTML = resaltarDestino(b, CONFIG.lenguaje);
+      i = (i + 1) % CONFIG.hero.length;
+    };
+    show();
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(show, 2800);
+  })();
+
+  cargar(CONFIG.ejemplos[0].codigo, CONFIG.ejemplos[0].tab);
+})();
+
+</script>
+
+</body></html>

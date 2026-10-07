@@ -1,0 +1,9 @@
+// Mini-Compilador 03 · Variables (caso correcto)
+ENTERO edad = 25
+TEXTO nombre = "Carlos"
+DECIMAL promedio = 91.5
+BOOLEANO activo = VERDADERO
+IMPRIMIR nombre
+IMPRIMIR edad
+MOSTRAR promedio
+IMPRIMIR activo
