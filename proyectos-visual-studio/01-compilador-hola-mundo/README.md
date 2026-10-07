@@ -242,18 +242,7 @@ El analizador informa que `MOSTRAR` no pertenece al lenguaje definido para este 
 | `MiniCompiladorHolaMundo.csproj` | Define el proyecto de consola en .NET 8. |
 | `README.md` | Explica el funcionamiento, sintaxis, pruebas y forma de ejecución. |
 
-## Qué no forma parte de la entrega
 
-No se deben subir al repositorio:
-
-```text
-bin/
-obj/
-salida/
-.vs/
-```
-
-Estas carpetas son locales o se generan automáticamente.
 
 ## Integrantes
 
