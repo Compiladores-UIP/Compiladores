@@ -1,5 +1,0 @@
-ENTERO i = 0
-REPETIR
- i = i + 1
-HASTA i >= 2
-IMPRIMIR i
