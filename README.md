@@ -126,11 +126,11 @@ Las tarjetas acompañan el desplazamiento y las secciones aparecen al avanzar po
 
 | Grupo | Integrantes | Módulos a cargo |
 | --- | --- | --- |
-| **01 · Grupo 1** | Daniela, Aaron y Euris | **01** Hola Mundo · **06** Estructuras IF · **09** Lenguaje para formularios |
-| **02 · Grupo 2** | Diego, Franklin y Gil | **02** Operaciones matemáticas · **07** Ciclos · **12** Mini lenguaje de programación completo |
-| **03 · Grupo 3** | Ana y Josimar | **03** Variables · **10** Consultas simples |
-| **04 · Grupo 4** | Karen y Zachrison | **04** Calculadora · **11** Lenguaje de configuración |
-| **05 · Grupo 5** | Miguel Mes, Alonso y Carlos | **05** Mensajes personalizados · **08** Pseudocódigo a C# |
+| **Grupo 1** | Daniela, Aaron y Euris | **01** Hola Mundo · **06** Estructuras IF · **09** Lenguaje para formularios |
+| **Grupo 2** | Diego, Franklin y Gil | **02** Operaciones matemáticas · **07** Ciclos · **12** Mini lenguaje de programación completo |
+| **Grupo 3** | Ana y Josimar | **03** Variables · **10** Consultas simples |
+| **Grupo 4** | Karen y Zachrison | **04** Calculadora · **11** Lenguaje de configuración |
+| **Grupo 5** | Miguel Mes, Alonso y Carlos | **05** Mensajes personalizados · **08** Pseudocódigo a C# |
 | **Landing Page** | Franklin |  |
 
 <details>
