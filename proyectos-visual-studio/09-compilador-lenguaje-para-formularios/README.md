@@ -435,5 +435,5 @@ Los archivos temporales generados por este proceso no forman parte del repositor
 ## Integrantes
 
 - Daniela Insturaín
-- Aaron Fechrenback
+- Aaron Fehrenbach
 - Euris J. Rodríguez V.
