@@ -1,0 +1,7 @@
+# Plantillas: las variables se escriben entre llaves dentro del texto
+TEXTO nombre = "Carlos"
+ENTERO edad = 21
+DECIMAL promedio = 2.75
+MOSTRAR "Hola {nombre}, tienes {edad} años."
+MOSTRAR "Tu índice académico es {promedio}."
+MOSTRAR "En una plantilla, {{nombre}} se muestra tal cual."

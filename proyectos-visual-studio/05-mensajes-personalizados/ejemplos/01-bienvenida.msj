@@ -1,0 +1,5 @@
+# Tema 05 · Mensaje de bienvenida con concatenación
+TEXTO nombre = "Ana"
+TEXTO curso = "Compiladores"
+MOSTRAR "Bienvenida, " + nombre + "."
+MOSTRAR "Hoy empiezas el curso de " + curso + "."

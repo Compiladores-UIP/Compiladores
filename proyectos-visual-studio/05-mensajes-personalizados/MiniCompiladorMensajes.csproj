@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>MensajesPersonalizados</RootNamespace>
+    <AssemblyName>MiniCompiladorMensajes</AssemblyName>
+    <DefaultItemExcludes>$(DefaultItemExcludes);salida/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="ejemplos/**/*.msj" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+# Mensaje personalizado con datos que escribe el usuario
+TEXTO nombre
+TEXTO ciudad
+ENTERO edad
+PEDIR nombre "¿Cómo te llamas?"
+PEDIR ciudad "¿En qué ciudad vives?"
+PEDIR edad "¿Cuántos años tienes?"
+MOSTRAR "────────────────────────────"
+MOSTRAR "Hola, {nombre} de {ciudad}."
+MOSTRAR "El próximo año cumplirás " + (edad + 1) + " años."
+MOSTRAR "Tu nombre en mayúsculas: " + MAYUSCULAS(nombre)
+MOSTRAR "────────────────────────────"

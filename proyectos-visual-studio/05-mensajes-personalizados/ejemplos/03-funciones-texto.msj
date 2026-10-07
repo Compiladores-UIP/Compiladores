@@ -1,0 +1,7 @@
+# Funciones de texto y operaciones dentro de un mensaje
+TEXTO nombre = "miguel"
+ENTERO boletos = 3
+DECIMAL precio = 12.5
+MOSTRAR "Cliente: " + MAYUSCULAS(nombre)
+MOSTRAR "Tu nombre tiene " + LONGITUD(nombre) + " letras."
+MOSTRAR "Compraste {boletos} boletos. Total: $" + (boletos * precio)

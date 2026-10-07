@@ -1,0 +1,4 @@
+TEXTO nombre = "Ana"
+ENTERO edad = "veinte"
+MOSTRAR "Hola {nombre}, vives en {ciudad}."
+MOSTRAR nombre - 1
