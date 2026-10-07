@@ -1,0 +1,9 @@
+// Mini-Compilador 03 · Variables (casos incorrectos)
+ENTERO edad = 20.5
+TEXTO nombre = Carlos
+entero nota = 90
+ENTERO = 5
+DECIMAL 2promedio = 8.5
+BOOLEANO activo = "si"
+IMPRIMIR apellido
+TEXTO saludo = "Hola
