@@ -1,8 +1,0 @@
-// Mini-Compilador 10 · Consultas simples (casos incorrectos)
-BUSCAR estudiante DONDE edad >
-buscar estudiante DONDE edad > 18
-BUSCAR estudiantes DONDE edad > 18
-BUSCAR estudiante DONDE telefono = "6000-0000"
-BUSCAR estudiante DONDE edad > "veinte"
-BUSCAR estudiante DONDE nombre = Ana
-BUSCAR estudiante DONDE edad # 18

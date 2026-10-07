@@ -1,5 +1,0 @@
-// Mini-Compilador 10 · Consultas simples (casos correctos)
-BUSCAR estudiante DONDE edad > 18
-BUSCAR nombre, carrera DE estudiante DONDE carrera = "Sistemas" Y promedio >= 80
-BUSCAR estudiante DONDE edad < 18 O promedio < 70 ORDENAR POR edad DESC
-BUSCAR curso
