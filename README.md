@@ -132,6 +132,7 @@ Las tarjetas acompañan el desplazamiento y las secciones aparecen al avanzar po
 | **Grupo 4** | Karen y Zachrison | **04** Calculadora · **11** Lenguaje de configuración |
 | **Grupo 5** | Miguel Mes, Alonso y Carlos | **05** Mensajes personalizados · **08** Pseudocódigo a C# |
 | **Landing Page** | Franklin |  |
+| **Administrador**| José |  |
 
 <details>
 <summary><strong>¿Quieres abrir los compiladores en Visual Studio?</strong></summary>
